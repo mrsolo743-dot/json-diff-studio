@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сравнение JSON</title>
+<style>
+:root{--bg:#f7f7f5;--card:#fff;--text:#1d1d1b;--muted:#6b6b66;--line:#e3e2dc;
+--add:#1f7a3d;--add-bg:#e5f4ea;--rem:#b42318;--rem-bg:#fbe9e7;--chg:#9a6700;--chg-bg:#fdf3d8;
+--mov:#0b6b8a;--mov-bg:#e1f1f7;--accent:#3b5bdb}
+@media (prefers-color-scheme:dark){:root{--bg:#141413;--card:#1e1e1c;--text:#ececea;--muted:#a2a29c;
+--line:#33332f;--add:#6fd08f;--add-bg:#173322;--rem:#ff8a7a;--rem-bg:#3a1c18;--chg:#f2c14e;
+--chg-bg:#3a2f12;--mov:#6cc7e6;--mov-bg:#123240;--accent:#8ea2ff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:22px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px;word-break:break-all}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.card b{display:block;font-size:24px;font-variant-numeric:tabular-nums}
+.card span{color:var(--muted);font-size:13px}
+.card.added b{color:var(--add)}.card.removed b{color:var(--rem)}.card.changed b{color:var(--chg)}.card.moved b{color:var(--mov)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.bar button{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:5px 12px;cursor:pointer;font:inherit;font-size:14px}
+.bar button[aria-pressed=true]{border-color:var(--accent);color:var(--accent);font-weight:600}
+.bar input{flex:1;min-width:180px;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:8px;padding:7px 10px;font:inherit}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600}
+td code{font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}
+.tag{display:inline-block;border-radius:6px;padding:1px 8px;font-size:12px;font-weight:600;white-space:nowrap}
+.tag.added{color:var(--add);background:var(--add-bg)}.tag.removed{color:var(--rem);background:var(--rem-bg)}
+.tag.changed{color:var(--chg);background:var(--chg-bg)}.tag.moved{color:var(--mov);background:var(--mov-bg)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+details{margin-top:22px}
+summary{cursor:pointer;font-weight:600}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace}
+@media (max-width:640px){th:nth-child(4),td:nth-child(4){display:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>Сравнение JSON</h1>
+<p class="sub">examples/before.json → examples/after.json</p>
+<div class="cards" id="cards"></div>
+<div class="bar" id="bar">
+<button data-f="all" aria-pressed="true">Все</button>
+<button data-f="added" aria-pressed="false">Добавлено</button>
+<button data-f="removed" aria-pressed="false">Удалено</button>
+<button data-f="changed" aria-pressed="false">Изменено</button>
+<button data-f="moved" aria-pressed="false">Перемещено</button>
+<input id="q" type="search" placeholder="Поиск по пути или значению">
+</div>
+<table><thead><tr><th>Тип</th><th>Путь</th><th>Было</th><th>Стало</th></tr></thead><tbody id="rows"></tbody></table>
+<details><summary>JSON Patch (RFC 6902) — операций: <span id="opcount"></span></summary><pre id="patch"></pre></details>
+</main>
+<script>
+const DATA = {"summary": {"added": 2, "removed": 1, "changed": 5, "moved": 1, "total": 9}, "changes": [{"type": "changed", "path": "$.debug", "old": true, "new": "false"}, {"type": "added", "path": "$.features[1]", "new": "audit-log"}, {"type": "changed", "path": "$.limits.rps", "old": 200, "new": 250}, {"type": "removed", "path": "$.users[id=2]", "old": {"id": 2, "name": "Данияр", "role": "editor", "email": "daniyar@example.com"}}, {"type": "moved", "path": "$.users[id=3]", "old": 2, "new": 0}, {"type": "changed", "path": "$.users[id=3].role", "old": "viewer", "new": "editor"}, {"type": "changed", "path": "$.users[id=1].email", "old": "aliya@example.com", "new": "aliya@example.kz"}, {"type": "added", "path": "$.users[id=4]", "new": {"id": 4, "name": "Ерлан", "role": "viewer", "email": "erlan@example.com"}}, {"type": "changed", "path": "$.version", "old": "1.4.2", "new": "1.5.0"}], "patch": [{"op": "replace", "path": "/debug", "value": "false"}, {"op": "add", "path": "/features/1", "value": "audit-log"}, {"op": "replace", "path": "/limits/rps", "value": 250}, {"op": "replace", "path": "/limits/timeoutSec", "value": 2.5000001}, {"op": "remove", "path": "/users/1"}, {"op": "move", "from": "/users/1", "path": "/users/0"}, {"op": "replace", "path": "/users/0/role", "value": "editor"}, {"op": "replace", "path": "/users/1/email", "value": "aliya@example.kz"}, {"op": "add", "path": "/users/2", "value": {"id": 4, "name": "Ерлан", "role": "viewer", "email": "erlan@example.com"}}, {"op": "replace", "path": "/version", "value": "1.5.0"}]};
+const LABELS = {added:"добавлено",removed:"удалено",changed:"изменено",moved:"перемещено"};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const show = v => v === undefined ? "" : JSON.stringify(v, null, 2);
+let filter = "all";
+function renderCards(){
+  const s = DATA.summary;
+  document.getElementById("cards").innerHTML = [["total","Всего"],["added","Добавлено"],["removed","Удалено"],["changed","Изменено"],["moved","Перемещено"]]
+    .map(([k,l]) => `<div class="card ${k}"><b>${s[k]}</b><span>${l}</span></div>`).join("");
+}
+function renderRows(){
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const rows = DATA.changes.filter(c => (filter === "all" || c.type === filter) &&
+    (!q || (c.path + " " + show(c.old) + " " + show(c.new)).toLowerCase().includes(q)));
+  document.getElementById("rows").innerHTML = rows.length ? rows.map(c =>
+    `<tr><td><span class="tag ${c.type}">${LABELS[c.type]}</span></td><td><code>${esc(c.path)}</code></td>` +
+    `<td><code>${esc(c.type === "moved" ? "позиция " + c.old : show(c.old))}</code></td>` +
+    `<td><code>${esc(c.type === "moved" ? "позиция " + c.new : show(c.new))}</code></td></tr>`).join("")
+    : `<tr><td colspan="4" class="empty">${DATA.changes.length ? "Ничего не найдено" : "Различий нет"}</td></tr>`;
+}
+document.getElementById("bar").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  filter = b.dataset.f;
+  document.querySelectorAll("#bar button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  renderRows();
+});
+document.getElementById("q").addEventListener("input", renderRows);
+document.getElementById("patch").textContent = JSON.stringify(DATA.patch, null, 2);
+document.getElementById("opcount").textContent = DATA.patch.length;
+renderCards(); renderRows();
+</script>
+</body>
+</html>

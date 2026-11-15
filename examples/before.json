@@ -1,0 +1,13 @@
+{
+  "service": "orders-api",
+  "version": "1.4.2",
+  "updatedAt": "2026-11-01T10:00:00Z",
+  "limits": {"rps": 200, "burst": 50, "timeoutSec": 2.5},
+  "features": ["search", "export", "webhooks"],
+  "users": [
+    {"id": 1, "name": "Алия", "role": "admin", "email": "aliya@example.com"},
+    {"id": 2, "name": "Данияр", "role": "editor", "email": "daniyar@example.com"},
+    {"id": 3, "name": "Мария", "role": "viewer", "email": "maria@example.com"}
+  ],
+  "debug": true
+}

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "json-diff-studio"
+version = "1.0.0"
+description = "Структурное сравнение JSON и JSON Patch (RFC 6902): CLI, HTML-отчёты и веб-песочница"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "mrsolo743-dot" }]
+keywords = ["json", "diff", "json-patch", "rfc6902", "cli"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Environment :: Console",
+  "Topic :: Software Development :: Testing",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+e2e = ["pytest>=7", "playwright>=1.40"]
+
+[project.scripts]
+json-diff-studio = "json_diff_studio.cli:main"
+
+[tool.setuptools]
+packages = ["json_diff_studio"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

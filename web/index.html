@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JSON Diff Studio</title>
+  <meta name="description" content="Структурное сравнение JSON и JSON Patch (RFC 6902) прямо в браузере">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">{ Δ }</span>
+      <div>
+        <h1>JSON Diff Studio</h1>
+        <p>Структурное сравнение JSON и JSON Patch — всё считается в браузере</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button type="button" id="btn-example" class="ghost">Пример</button>
+      <button type="button" id="btn-theme" class="ghost" aria-label="Переключить тему">Тема</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="editors">
+      <div class="editor" data-side="a">
+        <div class="editor-head">
+          <label for="left">Было (A)</label>
+          <div class="tools">
+            <label class="file-btn">Файл<input type="file" accept=".json,application/json" data-load="left" hidden></label>
+            <button type="button" data-format="left">Формат</button>
+            <button type="button" data-clear="left">Очистить</button>
+          </div>
+        </div>
+        <textarea id="left" spellcheck="false" placeholder='{"name": "до"}'></textarea>
+        <p class="status" id="left-status" role="status"></p>
+      </div>
+
+      <div class="swap-col">
+        <button type="button" id="btn-swap" title="Поменять местами A и B" aria-label="Поменять местами">⇄</button>
+      </div>
+
+      <div class="editor" data-side="b">
+        <div class="editor-head">
+          <label for="right">Стало (B)</label>
+          <div class="tools">
+            <label class="file-btn">Файл<input type="file" accept=".json,application/json" data-load="right" hidden></label>
+            <button type="button" data-format="right">Формат</button>
+            <button type="button" data-clear="right">Очистить</button>
+          </div>
+        </div>
+        <textarea id="right" spellcheck="false" placeholder='{"name": "после"}'></textarea>
+        <p class="status" id="right-status" role="status"></p>
+      </div>
+    </section>
+
+    <details class="options" id="options" open>
+      <summary>Настройки сравнения</summary>
+      <div class="opt-grid">
+        <label>Ключи массивов
+          <input id="opt-keys" type="text" placeholder="id, $.users=email">
+          <small>Элементы массивов сопоставляются по ключу, а не по позиции</small>
+        </label>
+        <label>Игнорировать пути
+          <input id="opt-ignore" type="text" placeholder="$.meta.updatedAt, $..timestamp">
+          <small>Через запятую; <code>..</code> — любая глубина, <code>[*]</code> — любой элемент</small>
+        </label>
+        <label>Допуск для чисел
+          <input id="opt-tol" type="number" min="0" step="any" placeholder="0">
+          <small>Числа равны, если |a − b| ≤ допуска</small>
+        </label>
+        <div class="checks">
+          <label><input type="checkbox" id="opt-case"> Без учёта регистра</label>
+          <label><input type="checkbox" id="opt-order"> Массивы без учёта порядка</label>
+          <label><input type="checkbox" id="opt-tests"> test-операции в патче</label>
+        </div>
+      </div>
+      <p class="hint">Допуск, регистр и порядок влияют только на список изменений. Патч всегда точный.</p>
+    </details>
+
+    <div class="run-row">
+      <button type="button" id="btn-compare" class="primary">Сравнить <kbd>Ctrl</kbd>+<kbd>Enter</kbd></button>
+      <label class="auto"><input type="checkbox" id="opt-auto" checked> Сравнивать при вводе</label>
+      <p class="error" id="global-error" role="alert"></p>
+    </div>
+
+    <section class="results" id="results" hidden>
+      <div class="cards" id="cards"></div>
+
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" id="tab-changes" aria-selected="true" aria-controls="panel-changes">Изменения</button>
+        <button type="button" role="tab" id="tab-patch" aria-selected="false" aria-controls="panel-patch">JSON Patch</button>
+        <button type="button" role="tab" id="tab-apply" aria-selected="false" aria-controls="panel-apply">Применить патч</button>
+      </div>
+
+      <div class="panel" id="panel-changes" role="tabpanel" aria-labelledby="tab-changes">
+        <div class="filter-bar" id="filters">
+          <button type="button" data-f="all" aria-pressed="true">Все</button>
+          <button type="button" data-f="added" aria-pressed="false">Добавлено</button>
+          <button type="button" data-f="removed" aria-pressed="false">Удалено</button>
+          <button type="button" data-f="changed" aria-pressed="false">Изменено</button>
+          <button type="button" data-f="moved" aria-pressed="false">Перемещено</button>
+          <input type="search" id="search" placeholder="Поиск по пути или значению">
+        </div>
+        <ol class="changes" id="changes"></ol>
+      </div>
+
+      <div class="panel" id="panel-patch" role="tabpanel" aria-labelledby="tab-patch" hidden>
+        <div class="panel-tools">
+          <span id="patch-count"></span>
+          <button type="button" id="btn-copy">Копировать</button>
+          <button type="button" id="btn-download">Скачать patch.json</button>
+        </div>
+        <pre id="patch-out"></pre>
+      </div>
+
+      <div class="panel" id="panel-apply" role="tabpanel" aria-labelledby="tab-apply" hidden>
+        <p class="hint">Вставьте патч (по умолчанию — текущий) и примените его к документу A.</p>
+        <textarea id="apply-patch" spellcheck="false"></textarea>
+        <div class="panel-tools">
+          <button type="button" id="btn-use-current">Взять текущий патч</button>
+          <button type="button" id="btn-apply" class="primary">Применить к A</button>
+          <span id="apply-status" role="status"></span>
+        </div>
+        <pre id="apply-out"></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer>json-diff-studio · MIT · <a href="https://www.rfc-editor.org/rfc/rfc6902" rel="noopener">RFC 6902</a></footer>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "json-diff-studio-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "JS-порт json-diff-studio и веб-песочница",
+  "type": "module",
+  "scripts": {
+    "test": "node --test web/tests/core.test.mjs",
+    "serve": "python -m http.server 8000 --directory web"
+  },
+  "license": "MIT"
+}

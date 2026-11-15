@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+node_modules/
+test-results/
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+# локальные результаты
+report.html
+patch.json

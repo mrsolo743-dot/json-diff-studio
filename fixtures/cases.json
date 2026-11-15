@@ -1,0 +1,1183 @@
+[
+  {
+    "name": "равные документы",
+    "a": {
+      "x": [
+        1,
+        2,
+        {
+          "y": null
+        }
+      ]
+    },
+    "b": {
+      "x": [
+        1,
+        2,
+        {
+          "y": null
+        }
+      ]
+    },
+    "changes": [],
+    "patch": [],
+    "patched": {
+      "x": [
+        1,
+        2,
+        {
+          "y": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "скаляры в корне",
+    "a": 1,
+    "b": "1",
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$",
+        "old": 1,
+        "new": "1"
+      }
+    ],
+    "patch": [
+      {
+        "op": "replace",
+        "path": "",
+        "value": "1"
+      }
+    ],
+    "patched": "1"
+  },
+  {
+    "name": "ключи объекта",
+    "a": {
+      "a": 1,
+      "b": 2,
+      "c": {
+        "d": 3
+      }
+    },
+    "b": {
+      "a": 1,
+      "c": {
+        "d": 4,
+        "e": 5
+      },
+      "f": [
+        1
+      ]
+    },
+    "changes": [
+      {
+        "type": "removed",
+        "path": "$.b",
+        "old": 2
+      },
+      {
+        "type": "changed",
+        "path": "$.c.d",
+        "old": 3,
+        "new": 4
+      },
+      {
+        "type": "added",
+        "path": "$.c.e",
+        "new": 5
+      },
+      {
+        "type": "added",
+        "path": "$.f",
+        "new": [
+          1
+        ]
+      }
+    ],
+    "patch": [
+      {
+        "op": "remove",
+        "path": "/b"
+      },
+      {
+        "op": "replace",
+        "path": "/c/d",
+        "value": 4
+      },
+      {
+        "op": "add",
+        "path": "/c/e",
+        "value": 5
+      },
+      {
+        "op": "add",
+        "path": "/f",
+        "value": [
+          1
+        ]
+      }
+    ],
+    "patched": {
+      "a": 1,
+      "c": {
+        "d": 4,
+        "e": 5
+      },
+      "f": [
+        1
+      ]
+    }
+  },
+  {
+    "name": "true не равно 1",
+    "a": {
+      "flag": true,
+      "n": 1
+    },
+    "b": {
+      "flag": 1,
+      "n": 1.0
+    },
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$.flag",
+        "old": true,
+        "new": 1
+      }
+    ],
+    "patch": [
+      {
+        "op": "replace",
+        "path": "/flag",
+        "value": 1
+      }
+    ],
+    "patched": {
+      "n": 1,
+      "flag": 1
+    }
+  },
+  {
+    "name": "вставка в середину массива",
+    "a": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "b": [
+      1,
+      2,
+      99,
+      3,
+      4
+    ],
+    "changes": [
+      {
+        "type": "added",
+        "path": "$[2]",
+        "new": 99
+      }
+    ],
+    "patch": [
+      {
+        "op": "add",
+        "path": "/2",
+        "value": 99
+      }
+    ],
+    "patched": [
+      1,
+      2,
+      99,
+      3,
+      4
+    ]
+  },
+  {
+    "name": "удаление и замена в массиве",
+    "a": [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e"
+    ],
+    "b": [
+      "a",
+      "x",
+      "d",
+      "e",
+      "f"
+    ],
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$[1]",
+        "old": "b",
+        "new": "x"
+      },
+      {
+        "type": "removed",
+        "path": "$[2]",
+        "old": "c"
+      },
+      {
+        "type": "added",
+        "path": "$[4]",
+        "new": "f"
+      }
+    ],
+    "patch": [
+      {
+        "op": "replace",
+        "path": "/1",
+        "value": "x"
+      },
+      {
+        "op": "remove",
+        "path": "/2"
+      },
+      {
+        "op": "add",
+        "path": "/4",
+        "value": "f"
+      }
+    ],
+    "patched": [
+      "a",
+      "x",
+      "d",
+      "e",
+      "f"
+    ]
+  },
+  {
+    "name": "вложенные объекты в массиве",
+    "a": [
+      {
+        "n": 1,
+        "v": "a"
+      },
+      {
+        "n": 2,
+        "v": "b"
+      }
+    ],
+    "b": [
+      {
+        "n": 1,
+        "v": "a"
+      },
+      {
+        "n": 2,
+        "v": "B"
+      },
+      {
+        "n": 3,
+        "v": "c"
+      }
+    ],
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$[1].v",
+        "old": "b",
+        "new": "B"
+      },
+      {
+        "type": "added",
+        "path": "$[2]",
+        "new": {
+          "n": 3,
+          "v": "c"
+        }
+      }
+    ],
+    "patch": [
+      {
+        "op": "replace",
+        "path": "/1/v",
+        "value": "B"
+      },
+      {
+        "op": "add",
+        "path": "/2",
+        "value": {
+          "n": 3,
+          "v": "c"
+        }
+      }
+    ],
+    "patched": [
+      {
+        "n": 1,
+        "v": "a"
+      },
+      {
+        "n": 2,
+        "v": "B"
+      },
+      {
+        "n": 3,
+        "v": "c"
+      }
+    ]
+  },
+  {
+    "name": "массив по ключу id",
+    "a": {
+      "users": [
+        {
+          "id": 1,
+          "name": "A"
+        },
+        {
+          "id": 2,
+          "name": "B"
+        },
+        {
+          "id": 3,
+          "name": "C"
+        }
+      ]
+    },
+    "b": {
+      "users": [
+        {
+          "id": 3,
+          "name": "C"
+        },
+        {
+          "id": 1,
+          "name": "A2"
+        },
+        {
+          "id": 4,
+          "name": "D"
+        }
+      ]
+    },
+    "options": {
+      "arrayKeys": [
+        "id"
+      ]
+    },
+    "changes": [
+      {
+        "type": "removed",
+        "path": "$.users[id=2]",
+        "old": {
+          "id": 2,
+          "name": "B"
+        }
+      },
+      {
+        "type": "moved",
+        "path": "$.users[id=3]",
+        "old": 2,
+        "new": 0
+      },
+      {
+        "type": "changed",
+        "path": "$.users[id=1].name",
+        "old": "A",
+        "new": "A2"
+      },
+      {
+        "type": "added",
+        "path": "$.users[id=4]",
+        "new": {
+          "id": 4,
+          "name": "D"
+        }
+      }
+    ],
+    "patch": [
+      {
+        "op": "remove",
+        "path": "/users/1"
+      },
+      {
+        "op": "move",
+        "from": "/users/1",
+        "path": "/users/0"
+      },
+      {
+        "op": "replace",
+        "path": "/users/1/name",
+        "value": "A2"
+      },
+      {
+        "op": "add",
+        "path": "/users/2",
+        "value": {
+          "id": 4,
+          "name": "D"
+        }
+      }
+    ],
+    "patched": {
+      "users": [
+        {
+          "id": 3,
+          "name": "C"
+        },
+        {
+          "id": 1,
+          "name": "A2"
+        },
+        {
+          "id": 4,
+          "name": "D"
+        }
+      ]
+    }
+  },
+  {
+    "name": "ключ только для одного пути",
+    "a": {
+      "x": [
+        {
+          "id": 1
+        },
+        {
+          "id": 2
+        }
+      ],
+      "y": [
+        {
+          "id": 1
+        },
+        {
+          "id": 2
+        }
+      ]
+    },
+    "b": {
+      "x": [
+        {
+          "id": 2
+        },
+        {
+          "id": 1
+        }
+      ],
+      "y": [
+        {
+          "id": 2
+        },
+        {
+          "id": 1
+        }
+      ]
+    },
+    "options": {
+      "arrayKeys": [
+        "$.x=id"
+      ]
+    },
+    "changes": [
+      {
+        "type": "moved",
+        "path": "$.x[id=2]",
+        "old": 1,
+        "new": 0
+      },
+      {
+        "type": "removed",
+        "path": "$.y[0]",
+        "old": {
+          "id": 1
+        }
+      },
+      {
+        "type": "added",
+        "path": "$.y[1]",
+        "new": {
+          "id": 1
+        }
+      }
+    ],
+    "patch": [
+      {
+        "op": "move",
+        "from": "/x/1",
+        "path": "/x/0"
+      },
+      {
+        "op": "remove",
+        "path": "/y/0"
+      },
+      {
+        "op": "add",
+        "path": "/y/1",
+        "value": {
+          "id": 1
+        }
+      }
+    ],
+    "patched": {
+      "x": [
+        {
+          "id": 2
+        },
+        {
+          "id": 1
+        }
+      ],
+      "y": [
+        {
+          "id": 2
+        },
+        {
+          "id": 1
+        }
+      ]
+    }
+  },
+  {
+    "name": "ключ не уникален — откат к LCS",
+    "a": [
+      {
+        "id": 1,
+        "v": 1
+      },
+      {
+        "id": 1,
+        "v": 2
+      }
+    ],
+    "b": [
+      {
+        "id": 1,
+        "v": 1
+      },
+      {
+        "id": 1,
+        "v": 3
+      }
+    ],
+    "options": {
+      "arrayKeys": [
+        "id"
+      ]
+    },
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$[1].v",
+        "old": 2,
+        "new": 3
+      }
+    ],
+    "patch": [
+      {
+        "op": "replace",
+        "path": "/1/v",
+        "value": 3
+      }
+    ],
+    "patched": [
+      {
+        "id": 1,
+        "v": 1
+      },
+      {
+        "id": 1,
+        "v": 3
+      }
+    ]
+  },
+  {
+    "name": "игнорирование путей",
+    "a": {
+      "meta": {
+        "updatedAt": "t1",
+        "by": "x"
+      },
+      "items": [
+        {
+          "id": 1,
+          "ts": 5,
+          "v": 1
+        }
+      ]
+    },
+    "b": {
+      "meta": {
+        "updatedAt": "t2",
+        "by": "y"
+      },
+      "items": [
+        {
+          "id": 1,
+          "ts": 9,
+          "v": 2
+        }
+      ]
+    },
+    "options": {
+      "ignore": [
+        "$.meta.updatedAt",
+        "$.items[*].ts"
+      ]
+    },
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$.items[0].v",
+        "old": 1,
+        "new": 2
+      },
+      {
+        "type": "changed",
+        "path": "$.meta.by",
+        "old": "x",
+        "new": "y"
+      }
+    ],
+    "patch": [
+      {
+        "op": "replace",
+        "path": "/items/0/v",
+        "value": 2
+      },
+      {
+        "op": "replace",
+        "path": "/meta/by",
+        "value": "y"
+      }
+    ],
+    "patched": {
+      "meta": {
+        "updatedAt": "t1",
+        "by": "y"
+      },
+      "items": [
+        {
+          "id": 1,
+          "ts": 5,
+          "v": 2
+        }
+      ]
+    }
+  },
+  {
+    "name": "игнорирование ключа на любой глубине",
+    "a": {
+      "etag": "1",
+      "a": {
+        "etag": "2",
+        "b": [
+          {
+            "etag": "3",
+            "c": 1
+          }
+        ]
+      }
+    },
+    "b": {
+      "etag": "9",
+      "a": {
+        "etag": "8",
+        "b": [
+          {
+            "etag": "7",
+            "c": 2
+          }
+        ]
+      }
+    },
+    "options": {
+      "ignoreKeys": [
+        "etag"
+      ]
+    },
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$.a.b[0].c",
+        "old": 1,
+        "new": 2
+      }
+    ],
+    "patch": [
+      {
+        "op": "replace",
+        "path": "/a/b/0/c",
+        "value": 2
+      }
+    ],
+    "patched": {
+      "etag": "1",
+      "a": {
+        "etag": "2",
+        "b": [
+          {
+            "etag": "3",
+            "c": 2
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "допуск для чисел",
+    "a": {
+      "pi": 3.14159,
+      "e": 2.7
+    },
+    "b": {
+      "pi": 3.1416,
+      "e": 2.8
+    },
+    "options": {
+      "tolerance": 0.001
+    },
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$.e",
+        "old": 2.7,
+        "new": 2.8
+      }
+    ],
+    "patch": [
+      {
+        "op": "replace",
+        "path": "/e",
+        "value": 2.8
+      },
+      {
+        "op": "replace",
+        "path": "/pi",
+        "value": 3.1416
+      }
+    ],
+    "patched": {
+      "e": 2.8,
+      "pi": 3.1416
+    }
+  },
+  {
+    "name": "без учёта регистра",
+    "a": [
+      "Hello",
+      "World"
+    ],
+    "b": [
+      "hello",
+      "Мир"
+    ],
+    "options": {
+      "ignoreCase": true
+    },
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$[1]",
+        "old": "World",
+        "new": "Мир"
+      }
+    ],
+    "patch": [
+      {
+        "op": "replace",
+        "path": "/0",
+        "value": "hello"
+      },
+      {
+        "op": "replace",
+        "path": "/1",
+        "value": "Мир"
+      }
+    ],
+    "patched": [
+      "hello",
+      "Мир"
+    ]
+  },
+  {
+    "name": "без учёта порядка",
+    "a": {
+      "tags": [
+        "a",
+        "b",
+        "c",
+        "c"
+      ]
+    },
+    "b": {
+      "tags": [
+        "c",
+        "a",
+        "d",
+        "c"
+      ]
+    },
+    "options": {
+      "ignoreOrder": true
+    },
+    "changes": [
+      {
+        "type": "removed",
+        "path": "$.tags[1]",
+        "old": "b"
+      },
+      {
+        "type": "added",
+        "path": "$.tags[2]",
+        "new": "d"
+      }
+    ],
+    "patch": [
+      {
+        "op": "remove",
+        "path": "/tags/0"
+      },
+      {
+        "op": "remove",
+        "path": "/tags/0"
+      },
+      {
+        "op": "add",
+        "path": "/tags/1",
+        "value": "a"
+      },
+      {
+        "op": "add",
+        "path": "/tags/2",
+        "value": "d"
+      }
+    ],
+    "patched": {
+      "tags": [
+        "c",
+        "a",
+        "d",
+        "c"
+      ]
+    }
+  },
+  {
+    "name": "смена типа",
+    "a": {
+      "v": [
+        1,
+        2
+      ]
+    },
+    "b": {
+      "v": {
+        "0": 1,
+        "1": 2
+      }
+    },
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$.v",
+        "old": [
+          1,
+          2
+        ],
+        "new": {
+          "0": 1,
+          "1": 2
+        }
+      }
+    ],
+    "patch": [
+      {
+        "op": "replace",
+        "path": "/v",
+        "value": {
+          "0": 1,
+          "1": 2
+        }
+      }
+    ],
+    "patched": {
+      "v": {
+        "0": 1,
+        "1": 2
+      }
+    }
+  },
+  {
+    "name": "особые ключи",
+    "a": {
+      "a/b": 1,
+      "m~n": 2,
+      "with space": 3,
+      "": 4
+    },
+    "b": {
+      "a/b": 10,
+      "m~n": 20,
+      "with space": 30,
+      "": 40
+    },
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$[\"\"]",
+        "old": 4,
+        "new": 40
+      },
+      {
+        "type": "changed",
+        "path": "$[\"a/b\"]",
+        "old": 1,
+        "new": 10
+      },
+      {
+        "type": "changed",
+        "path": "$[\"m~n\"]",
+        "old": 2,
+        "new": 20
+      },
+      {
+        "type": "changed",
+        "path": "$[\"with space\"]",
+        "old": 3,
+        "new": 30
+      }
+    ],
+    "patch": [
+      {
+        "op": "replace",
+        "path": "/",
+        "value": 40
+      },
+      {
+        "op": "replace",
+        "path": "/a~1b",
+        "value": 10
+      },
+      {
+        "op": "replace",
+        "path": "/m~0n",
+        "value": 20
+      },
+      {
+        "op": "replace",
+        "path": "/with space",
+        "value": 30
+      }
+    ],
+    "patched": {
+      "": 40,
+      "a/b": 10,
+      "m~n": 20,
+      "with space": 30
+    }
+  },
+  {
+    "name": "патч с test-операциями",
+    "a": {
+      "a": 1,
+      "b": [
+        1,
+        2
+      ]
+    },
+    "b": {
+      "a": 2,
+      "b": [
+        1
+      ]
+    },
+    "withTests": true,
+    "changes": [
+      {
+        "type": "changed",
+        "path": "$.a",
+        "old": 1,
+        "new": 2
+      },
+      {
+        "type": "removed",
+        "path": "$.b[1]",
+        "old": 2
+      }
+    ],
+    "patch": [
+      {
+        "op": "test",
+        "path": "/a",
+        "value": 1
+      },
+      {
+        "op": "replace",
+        "path": "/a",
+        "value": 2
+      },
+      {
+        "op": "test",
+        "path": "/b/1",
+        "value": 2
+      },
+      {
+        "op": "remove",
+        "path": "/b/1"
+      }
+    ],
+    "patched": {
+      "b": [
+        1
+      ],
+      "a": 2
+    }
+  },
+  {
+    "name": "перестановка по ключу и правки",
+    "a": [
+      {
+        "k": "a",
+        "v": 1
+      },
+      {
+        "k": "b",
+        "v": 2
+      },
+      {
+        "k": "c",
+        "v": 3
+      },
+      {
+        "k": "d",
+        "v": 4
+      }
+    ],
+    "b": [
+      {
+        "k": "d",
+        "v": 4
+      },
+      {
+        "k": "b",
+        "v": 20
+      },
+      {
+        "k": "a",
+        "v": 1
+      },
+      {
+        "k": "c",
+        "v": 3
+      }
+    ],
+    "options": {
+      "arrayKeys": [
+        "k"
+      ]
+    },
+    "changes": [
+      {
+        "type": "moved",
+        "path": "$[k=\"d\"]",
+        "old": 3,
+        "new": 0
+      },
+      {
+        "type": "moved",
+        "path": "$[k=\"b\"]",
+        "old": 1,
+        "new": 1
+      },
+      {
+        "type": "changed",
+        "path": "$[k=\"b\"].v",
+        "old": 2,
+        "new": 20
+      }
+    ],
+    "patch": [
+      {
+        "op": "move",
+        "from": "/3",
+        "path": "/0"
+      },
+      {
+        "op": "move",
+        "from": "/2",
+        "path": "/1"
+      },
+      {
+        "op": "replace",
+        "path": "/1/v",
+        "value": 20
+      }
+    ],
+    "patched": [
+      {
+        "k": "d",
+        "v": 4
+      },
+      {
+        "k": "b",
+        "v": 20
+      },
+      {
+        "k": "a",
+        "v": 1
+      },
+      {
+        "k": "c",
+        "v": 3
+      }
+    ]
+  },
+  {
+    "name": "пустые контейнеры",
+    "a": {
+      "a": [],
+      "b": {}
+    },
+    "b": {
+      "a": [
+        1
+      ],
+      "b": {
+        "x": null
+      }
+    },
+    "changes": [
+      {
+        "type": "added",
+        "path": "$.a[0]",
+        "new": 1
+      },
+      {
+        "type": "added",
+        "path": "$.b.x",
+        "new": null
+      }
+    ],
+    "patch": [
+      {
+        "op": "add",
+        "path": "/a/0",
+        "value": 1
+      },
+      {
+        "op": "add",
+        "path": "/b/x",
+        "value": null
+      }
+    ],
+    "patched": {
+      "a": [
+        1
+      ],
+      "b": {
+        "x": null
+      }
+    }
+  }
+]
